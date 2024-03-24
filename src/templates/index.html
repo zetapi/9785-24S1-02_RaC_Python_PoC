@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Convert Legislation Files</title>
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            margin: 0;
+            height: 100vh; /* Full height of viewport */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none; /* Hide the file input */
+        }
+        .file-upload-label {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        #drop-area {
+            border: 2px dashed #4CAF50;
+            padding: 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #drop-area.highlight {
+            border-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convert from JPG</h1>
+    <p>Transform TXT, PDF, DOCX, and RTF to text files</p>
+    <p>Convert many legislation files online at once.</p>
+    <form method="post" enctype="multipart/form-data">
+        <label for="file-upload" class="file-upload-label">Select Legislation Files</label>
+        <input id="file-upload" type="file" name="files" multiple accept=".txt,.pdf,.docx,.rtf"><br>
+        <input type="submit" value="Upload" style="display: none;"> <!-- Hide the default submit button -->
+    </form>
+    <div id="drop-area" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <p>or drop legislation files here</p>
+    </div>
+
+    <script>
+        function handleDrop(event) {
+            event.preventDefault();
+            var files = event.dataTransfer.files;
+            document.getElementById('file-upload').files = files;
+            document.getElementById('file-upload').parentNode.submit();
+        }
+
+        document.getElementById('drop-area').addEventListener('dragenter', function(event) {
+            this.classList.add('highlight');
+        });
+
+        document.getElementById('drop-area').addEventListener('dragleave', function(event) {
+            this.classList.remove('highlight');
+        });
+    </script>
+</body>
+</html>
+
