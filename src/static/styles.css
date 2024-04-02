@@ -1,0 +1,88 @@
+body {
+    background-color: #333;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    height: 100vh;
+    /* Full height of viewport */
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    padding: 30px;
+    padding-top: 30px;
+}
+
+p {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#bottom-panel {
+    text-align: left;
+    margin-left: 30px;
+    margin-right: 30px;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    grid-gap: 10px;
+    padding: 5px;
+}
+
+#genandload {
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-gap: 10px;
+
+}
+
+#file-list {
+    margin-left: 10px;
+    text-align: left;
+}
+
+#file-list li {
+    margin: 0;
+    padding: 5px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="file"] {
+    display: none;
+    /* Hide the file input */
+}
+
+.button-label {
+    background-color: #2d87d1;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    margin: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+img {
+    height: 48px;
+    margin-top: 5px;
+    display: none;
+}
+
+#drop-area {
+    border: 2px dashed #2d87d1;
+    padding: 10%;
+    margin: 20px;
+    margin-bottom: 30px;
+    cursor: pointer;
+}
+
+#drop-area.highlight {
+    border-color: #ffffff;
+}
