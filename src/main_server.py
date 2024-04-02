@@ -3,13 +3,15 @@ import os
 import PyPDF2
 import docx
 import textract
+from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community import embeddings
 from langchain_community.chat_models import ChatOllama
-from langchain_core. runnables import RunnablePassthrough
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 app = Flask(__name__)
@@ -43,7 +45,10 @@ def get_files():
 @app.route('/generate_rules')
 def generate_rules():
     message = "success"
-    print("here")
+    print("Starting rules generation procedure")
+    
+    textEmbedding()
+
     return jsonify({"message": message})
 
 
@@ -88,6 +93,22 @@ def save_text_to_file(text, filename):
     output_file_path = os.path.join(output_dir, f'{clean_filename}.txt')
     with open(output_file_path, 'w', encoding='utf-8') as f:
         f.write(text)
+
+
+def textEmbedding():
+    directory = './src/extracted'
+    loader = DirectoryLoader(directory, glob="**/*.txt", loader_cls=TextLoader)
+    docs = loader.load()
+    print(f"Loaded {len(docs)} extracted doc/s")
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
+    doc_splits = text_splitter.split_documents(docs)
+
+
+    retriever = (Chroma.from_documents(
+        documents=doc_splits,
+        collection_name="rag-chroma",
+        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
+    )).as_retriever()
 
 
 def main():
