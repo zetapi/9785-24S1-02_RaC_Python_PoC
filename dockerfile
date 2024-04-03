@@ -2,10 +2,10 @@
 FROM python:3.9-slim
 
 # Install Supervisor
-RUN apt-get update && apt-get install -y supervisor
+RUN apt-get update && apt-get install -y supervisor curl
 
 # Install ollama package
-RUN apt-get install -y ollama
+RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Set the working directory in the container
 WORKDIR .
