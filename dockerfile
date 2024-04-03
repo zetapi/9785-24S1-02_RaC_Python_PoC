@@ -1,6 +1,12 @@
 # Use the official Python image as the base image
 FROM python:3.9-slim
 
+# Install Supervisor
+RUN apt-get update && apt-get install -y supervisor
+
+# Install ollama package
+RUN apt-get install -y ollama
+
 # Set the working directory in the container
 WORKDIR .
 
@@ -16,5 +22,8 @@ COPY . .
 # Expose the port that the Flask app will run on
 EXPOSE 5000
 
-# Set the command to run the Flask app
-CMD ["python", "./src/main_server.py"]
+# Copy Supervisor configuration file
+COPY supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+
+# Command to start Supervisor
+CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
