@@ -51,7 +51,7 @@ The primary objective of this project was to provide a capability to turn legisl
 
         $ cd /path/to/the/repo
 
-        $ docker build -t RaC-Engine .
+        $ docker build -t rac-engine .
 
 
 ### Usage
@@ -59,7 +59,7 @@ The primary objective of this project was to provide a capability to turn legisl
 
 2. Run the Docker image. This is the image that was built in the previous steps. It will also use the host's network interface, effectively turning it into a server for this app:
 
-        $ docker run --network=host RaC-Engine
+        $ docker run --network=host rac-engine
 
     This container will start the ollama server and start the web server as two separate processes.
 
