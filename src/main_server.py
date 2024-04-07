@@ -13,13 +13,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
+model_local = ChatOllama(model="dolphin-mistral")
 
 app = Flask(__name__)
-# app.static_folder = "src/templates/static"
-
-# Below function index points to the html template and calls appropriate
-# function based on the file type/s that are uploaded.
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -102,7 +98,7 @@ def textEmbedding():
     print(f"Loaded {len(docs)} extracted doc/s")
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=7500, chunk_overlap=100)
     doc_splits = text_splitter.split_documents(docs)
-
+    print(f"Split {len(doc_splits)}")
 
     retriever = (Chroma.from_documents(
         documents=doc_splits,
@@ -110,10 +106,17 @@ def textEmbedding():
         embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
     )).as_retriever()
 
+    print(f"ChromaDB retriever created\n")
+    print(f"###\nTest joke:")
+    rag_template = "Tell me a funny joke about {topic}"
+    rag_prompt = ChatPromptTemplate.from_template(rag_template)
+    rag_chain = rag_prompt | model_local | StrOutputParser()
+    print(rag_chain.invoke({"topic": "bees"}))
+
 
 def main():
     print("Hello world")
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
