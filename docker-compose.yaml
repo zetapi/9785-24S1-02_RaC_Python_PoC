@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  ollama_server:
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:latest  # Official Ollama image
+    networks:
+     - bridge_net
+  
+
+  flask:
+    build:
+      context: .
+      dockerfile: ./dockerfile  # Path to the Dockerfile for Flask web server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - ollama_server
+    networks:
+      - bridge_net
+      # - host_net
+  
+
+networks:
+  bridge_net:
+    driver: bridge
+  host_net:
+    driver: host
+
+
+volumes:
+  ollama: {}

@@ -12,6 +12,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import TextSplitter
 
 model_local = ChatOllama(model="dolphin-mistral")
 
@@ -42,9 +43,9 @@ def get_files():
 def generate_rules():
     message = "success"
     print("Starting rules generation procedure")
-    
+    # Starts the full text embedding and rules generation
     textEmbedding()
-
+    # Returns status to the web app for showing the buttons
     return jsonify({"message": message})
 
 
@@ -112,6 +113,24 @@ def textEmbedding():
     rag_prompt = ChatPromptTemplate.from_template(rag_template)
     rag_chain = rag_prompt | model_local | StrOutputParser()
     print(rag_chain.invoke({"topic": "bees"}))
+    
+
+
+    print ("\n########\nAf ter RAG\n")
+    after_rag_template = """Answer the question based only on the following context:
+    {context}
+    Question: {question}
+    """
+    after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
+    after_rag_chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | after_rag_prompt
+        | model_local
+        | StrOutputParser()
+    )
+
+print (after_rag_chain.invoke("What is Ollama?"))
+
 
 
 def main():
