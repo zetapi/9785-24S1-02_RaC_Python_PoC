@@ -22,7 +22,7 @@ services:
               capabilities: [gpu]
   
 
-  flask:
+  flask_server:
     container_name: flask
     build:
       context: .
@@ -46,4 +46,9 @@ networks:
 
 
 volumes:
-  ollama: {}
+  ollama:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /media/ollama_models
