@@ -13,14 +13,24 @@ services:
     image: ollama/ollama:latest  # Official Ollama image
     networks:
      - bridge_net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
   
 
   flask:
+    container_name: flask
     build:
       context: .
       dockerfile: ./dockerfile  # Path to the Dockerfile for Flask web server
     ports:
       - "5000:5000"
+    environment:
+      - '/ollama/api=http://ollama:11434/api'
     depends_on:
       - ollama_server
     networks:
