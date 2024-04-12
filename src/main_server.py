@@ -93,6 +93,7 @@ def save_text_to_file(text, filename):
 
 
 def textEmbedding():
+    # Grab all extracted documents to be processed
     directory = './src/extracted'
     loader = DirectoryLoader(directory, glob="**/*.txt", loader_cls=TextLoader)
     docs = loader.load()
@@ -116,20 +117,19 @@ def textEmbedding():
     
 
 
-    print ("\n########\nAf ter RAG\n")
-    after_rag_template = """Answer the question based only on the following context:
-    {context}
-    Question: {question}
-    """
-    after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-    after_rag_chain = (
-        {"context": retriever, "question": RunnablePassthrough()}
-        | after_rag_prompt
-        | model_local
-        | StrOutputParser()
-    )
-
-print (after_rag_chain.invoke("What is Ollama?"))
+    # print ("\n########\nAf ter RAG\n")
+    # after_rag_template = """Answer the question based only on the following context:
+    # {context}
+    # Question: {question}
+    # """
+    # after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
+    # after_rag_chain = (
+    #     {"context": retriever, "question": RunnablePassthrough()}
+    #     | after_rag_prompt
+    #     | model_local
+    #     | StrOutputParser()
+    # )
+    # print (after_rag_chain.invoke("What is Ollama?"))
 
 
 
