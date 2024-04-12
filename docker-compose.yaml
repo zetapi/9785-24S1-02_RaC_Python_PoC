@@ -47,7 +47,8 @@ networks:
 
 
 volumes:
-  ollama:
+  ollama_models:
+    name: ollama_models
     driver: local
     driver_opts:
       type: none
