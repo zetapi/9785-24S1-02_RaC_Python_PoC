@@ -6,7 +6,7 @@ import textract
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community import embeddings
-from langchain_community.chat_models import ChatOllama
+from langchain_community.llms import Ollama
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
@@ -15,7 +15,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TextSplitter
 
 
-model_local = ChatOllama(model="nomic-embed-text")
+model_local = Ollama(model="mixtral:8x7b-instruct-v0.1-q2_K")
 
 
 app = Flask(__name__)
