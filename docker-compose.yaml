@@ -11,8 +11,8 @@ services:
     tty: true
     restart: unless-stopped
     image: ollama/ollama:latest  # Official Ollama image
-    networks:
-     - bridge_net
+    # networks:
+    #  - bridge_net
     deploy:
       resources:
         reservations:
@@ -31,14 +31,15 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - "OLLAMA_HOST=0.0.0.0:11434"
+      # - "OLLAMA_HOST=0.0.0.0:11434"
       # - "OLLAMA_SERVER_URL=http://172.23.0.2"
       # - "OLLAMA_ORIGINS=http://172.23.0.2:*"
-      # - "OLLAMA_API_BASE_URL=http://ollama:11434/api"
+      # - "OLLAMA_API_BASE_URL=http://host.docker.internal:11434/api"
+      - "OLLAMA_API_BASE_URL=http://ollama:11434/api"
     depends_on:
       - ollama_server
-    networks:
-      - bridge_net
+    # networks:
+    #   - bridge_net
       # - host_net
   
 
