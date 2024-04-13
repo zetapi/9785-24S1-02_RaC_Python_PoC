@@ -3,6 +3,8 @@ import os
 import PyPDF2
 import docx
 import textract
+import requests
+import json
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community import embeddings
@@ -13,9 +15,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TextSplitter
-
-
-model_local = Ollama(model="mixtral:8x7b-instruct-v0.1-q2_K")
 
 
 app = Flask(__name__)
@@ -49,6 +48,55 @@ def generate_rules():
     textEmbedding()
     # Returns status to the web app for showing the buttons
     return jsonify({"message": message})
+
+
+def get_model_name():
+    """
+    Reads the model name from the ./config/model.txt file.
+    """
+    config_dir = os.path.join(os.path.dirname(__file__), 'config')
+    model_file = os.path.join(config_dir, 'model.txt')
+    
+    try:
+        with open(model_file, 'r') as f:
+            model_name = f.read().strip()
+        return model_name
+    except FileNotFoundError:
+        print(f"Error: {model_file} not found.")
+        print("Setting to default model: tinydolphin...")
+        download_tinydolphin()
+        model_name = "tinydolphin:1.1b-v2.8-q2_K"
+        return model_name
+    except Exception as e:
+        print(f"Error reading {model_file}: {e}")
+        print("Setting to default model: tinydolphin...")
+        download_tinydolphin()
+        model_name = "tinydolphin:1.1b-v2.8-q2_K"
+        return model_name
+
+def download_tinydolphin():
+    url = "http://localhost:11434/api/pull"
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "name": "tinydolphin:1.1b-v2.8-q2_K"
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    if response.status_code == 200:
+        response_text = response.text
+        # data = json.loads(response_text)
+        # actual_response = data["response"]
+        print(response_text)
+    else:
+        print("Error:", response.status_code, response.text)
+
+
+    # curl http://localhost:11434/api/pull -d '{
+    #     "name": "llama2"
+    # }'
 
 
 def extract_text_from_pdf(file):
@@ -95,6 +143,7 @@ def save_text_to_file(text, filename):
 
 
 def textEmbedding():
+
     # Grab all extracted documents to be processed
     directory = './src/extracted'
     loader = DirectoryLoader(directory, glob="**/*.txt", loader_cls=TextLoader)
@@ -109,6 +158,8 @@ def textEmbedding():
         collection_name="rag-chroma",
         embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
     )).as_retriever()
+
+    model_local = Ollama(model=get_model_name())
 
     print(f"ChromaDB retriever created\n")
     print(f"###\nTest joke:")
