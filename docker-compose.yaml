@@ -43,11 +43,11 @@ services:
       # - host_net
   
 
-networks:
-  bridge_net:
-    driver: bridge
-  host_net:
-    driver: host
+# networks:
+#   bridge_net:
+#     driver: bridge
+#   host_net:
+#     driver: host
 
 
 volumes:
