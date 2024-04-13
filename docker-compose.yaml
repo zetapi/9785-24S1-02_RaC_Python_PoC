@@ -6,6 +6,8 @@ services:
       - ollama:/root/.ollama
     ports:
       - "11434:11434"
+    expose:
+      - 11434/tcp
     container_name: ollama
     pull_policy: always
     tty: true
