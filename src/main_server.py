@@ -15,7 +15,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TextSplitter
 
 
-model_local = ChatOllama(model="mixtral:instruct")
+model_local = ChatOllama(base_url='http://172.23.0.2', model="mixtral:instruct")
+
 
 app = Flask(__name__)
 
@@ -106,7 +107,7 @@ def textEmbedding():
     retriever = (Chroma.from_documents(
         documents=doc_splits,
         collection_name="rag-chroma",
-        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text', base_url='http://172.23.0.2')
+        embedding=embeddings.ollama.OllamaEmbeddings(base_url='http://172.23.0.2', model='nomic-embed-text')
     )).as_retriever()
 
     print(f"ChromaDB retriever created\n")
