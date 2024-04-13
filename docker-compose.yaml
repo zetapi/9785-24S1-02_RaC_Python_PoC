@@ -32,7 +32,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - "OLLAMA_API_BASE_URL=http://ollama:11434/api"
+      - "OLLAMA_API_BASE_URL=http://localhost:11434/api"
     depends_on:
       - ollama_server
     network_mode: host
