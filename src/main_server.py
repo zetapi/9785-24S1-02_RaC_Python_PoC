@@ -106,7 +106,7 @@ def textEmbedding():
     retriever = (Chroma.from_documents(
         documents=doc_splits,
         collection_name="rag-chroma",
-        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
+        embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text', base_url='http://172.23.0.2')
     )).as_retriever()
 
     print(f"ChromaDB retriever created\n")
