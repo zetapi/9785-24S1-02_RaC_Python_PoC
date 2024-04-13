@@ -15,7 +15,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.text_splitter import TextSplitter
 
 
-model_local = ChatOllama(model="mixtral:instruct")
+model_local = ChatOllama(model="mixtral:8x7b-instruct-v0.1-q2_K")
 
 
 app = Flask(__name__)
