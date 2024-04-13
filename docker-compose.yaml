@@ -13,8 +13,7 @@ services:
     tty: true
     restart: unless-stopped
     image: ollama/ollama:latest  # Official Ollama image
-    networks:
-     - ollama_network
+    network_mode: host
     deploy:
       resources:
         reservations:
@@ -36,8 +35,7 @@ services:
       - "OLLAMA_API_BASE_URL=http://ollama:11434/api"
     depends_on:
       - ollama_server
-    networks:
-      - ollama_network
+    network_mode: host
 
 
 volumes:
@@ -50,6 +48,6 @@ volumes:
       device: /media/ollama_models
 
 
-networks:
-  ollama_network:
-    driver: bridge
+# networks:
+#   ollama_network:
+#     driver: bridge
