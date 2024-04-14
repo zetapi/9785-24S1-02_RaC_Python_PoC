@@ -10,7 +10,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_community import embeddings
 from langchain_community.llms import Ollama
 from langchain_community.embeddings import OllamaEmbeddings
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -18,6 +18,8 @@ from langchain.text_splitter import TextSplitter
 
 
 app = Flask(__name__)
+
+retriever = Chroma()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -45,7 +47,8 @@ def generate_rules():
     message = "success"
     print("Starting rules generation procedure")
     # Starts the full text embedding and rules generation
-    textEmbedding()
+    rag_rules_gen_chain()
+
     # Returns status to the web app for showing the buttons
     return jsonify({"message": message})
 
@@ -55,11 +58,12 @@ def get_model_name():
     Reads the model name from the ./config/model.txt file.
     """
     config_dir = os.path.join(os.path.dirname(__file__), 'config')
-    model_file = os.path.join(config_dir, 'model.txt')
+    model_file = os.path.join(config_dir, 'model')
     
     try:
         with open(model_file, 'r') as f:
             model_name = f.read().strip()
+        print(f"Model successfully set: {model_name}")
         return model_name
     except FileNotFoundError:
         print(f"Error: {model_file} not found.")
@@ -73,6 +77,19 @@ def get_model_name():
         download_tinydolphin()
         model_name = "tinydolphin:1.1b-v2.8-q2_K"
         return model_name
+
+
+def get_instructions():
+    config_dir = os.path.join(os.path.dirname(__file__), 'config')
+    inst_file = os.path.join(config_dir, 'instructions')
+    try:
+        with open(inst_file, 'r') as f:
+            instructions = f.read().strip()
+        return instructions
+    except FileNotFoundError:
+        print(f"Error: {inst_file} file not found.")
+        return "Write a very short story about a beekeeper with an itchy nose"
+
 
 def download_tinydolphin():
     url = "http://localhost:11434/api/pull"
@@ -92,11 +109,6 @@ def download_tinydolphin():
         print(response_text)
     else:
         print("Error:", response.status_code, response.text)
-
-
-    # curl http://localhost:11434/api/pull -d '{
-    #     "name": "llama2"
-    # }'
 
 
 def extract_text_from_pdf(file):
@@ -142,8 +154,58 @@ def save_text_to_file(text, filename):
         f.write(text)
 
 
-def textEmbedding():
+def rag_rules_gen_chain():
+    rag_template = """Follow the instructions based only on the following context:
+    {context}
+    Instruction: {instructions}
+    """
+    rag_prompt = ChatPromptTemplate.from_template(rag_template)
+    
+    rag_chain = (
+        {"context": embedding_retrieval(), "instructions": RunnablePassthrough()}
+        | rag_prompt
+        | model_local
+        | StrOutputParser()
+    )
 
+    # print(rag_chain.invoke(get_instructions()))
+
+    if not os.path.exists('./src/output/out.json'):
+        os.mknod('./src/output/out.json')
+
+    with open('./src/output/out.json', 'w') as writer:
+        for s in rag_chain.stream(get_instructions()):
+            print(s)
+            writer.write(s)
+
+
+    # model_local = Ollama(model=get_model_name())
+
+
+    # print(f"ChromaDB retriever created\n")
+    # print(f"###\nTest joke:")
+    # rag_template = "Tell me a funny joke about {topic}"
+    # rag_prompt = ChatPromptTemplate.from_template(rag_template)
+    # rag_chain = rag_prompt | model_local | StrOutputParser()
+    # print(rag_chain.invoke({"topic": "bees"}))
+    
+
+
+    # print ("\n########\nAfter RAG\n")
+    # after_rag_template = """Answer the question based only on the following context:
+    # {context}
+    # Question: {question}
+    # """
+    # after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
+    # after_rag_chain = (
+    #     {"context": retriever, "question": RunnablePassthrough()}
+    #     | after_rag_prompt
+    #     | model_local
+    #     | StrOutputParser()
+    # )
+    # print (after_rag_chain.invoke("What is Ollama?"))
+
+def embedding_retrieval():
     # Grab all extracted documents to be processed
     directory = './src/extracted'
     loader = DirectoryLoader(directory, glob="**/*.txt", loader_cls=TextLoader)
@@ -158,32 +220,8 @@ def textEmbedding():
         collection_name="rag-chroma",
         embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
     )).as_retriever()
-
-    model_local = Ollama(model=get_model_name())
-
     print(f"ChromaDB retriever created\n")
-    print(f"###\nTest joke:")
-    rag_template = "Tell me a funny joke about {topic}"
-    rag_prompt = ChatPromptTemplate.from_template(rag_template)
-    rag_chain = rag_prompt | model_local | StrOutputParser()
-    print(rag_chain.invoke({"topic": "bees"}))
-    
-
-
-    # print ("\n########\nAf ter RAG\n")
-    # after_rag_template = """Answer the question based only on the following context:
-    # {context}
-    # Question: {question}
-    # """
-    # after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-    # after_rag_chain = (
-    #     {"context": retriever, "question": RunnablePassthrough()}
-    #     | after_rag_prompt
-    #     | model_local
-    #     | StrOutputParser()
-    # )
-    # print (after_rag_chain.invoke("What is Ollama?"))
-
+    return retriever
 
 
 def main():
@@ -191,5 +229,6 @@ def main():
 
 
 if __name__ == '__main__':
+    model_local = Ollama(model=get_model_name())
     app.run(debug=True, host='0.0.0.0', port=5000)
     # , host='0.0.0.0', port=5000

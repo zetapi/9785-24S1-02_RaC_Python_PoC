@@ -1,3 +1,4 @@
 .directory
 src/extracted/*.txt
 !requirements.txt
+*.json

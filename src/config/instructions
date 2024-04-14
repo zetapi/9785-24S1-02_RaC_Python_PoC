@@ -1,0 +1,15 @@
+1. The output must be a valid JSON object containing an array called "rules". 
+2. Each element in the "rules" array must be a JSON object representing an individual rule.  
+3. Rules with multiple conditions should use logical "AND"/boolean conjunction to combine conditions unless otherwise specified.
+4. Rules may optionally specify additional properties like "exceptionConditions" or "actions" as needed. 
+5. The output must be formatted using proper indentation for readability.
+6. Each rule object must contain a "description" property containing a plain text description of the rule.
+7. Each rule object should contain a "sectionReference" property specifying the relevant section/part of the source legislation that rule was derived from.
+8. The output must be validated against a JSON schema for the business rule format before returning.
+9. The AI must extract and maintain a "termBank" JSON object containing an array of unique terms and objects identified in the legislation. 
+10. Each rule object must contain a "id" property containing a unique string identifier for that rule.
+11. Each rule object must contain a "conditions" property containing an array of condition objects.
+12. Each condition object must contain a "field" property specifying the data field being evaluated.
+13. Each condition object must contain an "operator" property specifying the comparison operator like "==", ">=", etc.
+14. Each condition object must contain a "value" property specifying the value being compared against.
+15. The "description" property value must be formatted as one or more complete sentences using proper grammar, punctuation and capitalization.
