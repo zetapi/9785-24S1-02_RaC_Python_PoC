@@ -172,7 +172,7 @@ def rag_rules_gen_chain():
 
     if not os.path.exists('./src/output/'):
         print("Initialising output directory: ./src/output/")
-        os.mknod('./src/output/')
+        os.mkdir('./src/output/')
 
     with open('./src/output/out.json', 'w') as writer:
         print("Writing output file: out.json")
