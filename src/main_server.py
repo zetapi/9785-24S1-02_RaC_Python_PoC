@@ -5,6 +5,7 @@ import docx
 import textract
 import requests
 import json
+from datetime import datetime
 from langchain_community.document_loaders import TextLoader, DirectoryLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community import embeddings
@@ -51,6 +52,55 @@ def generate_rules():
 
     # Returns status to the web app for showing the buttons
     return jsonify({"message": message})
+
+
+@app.route('/instructions')
+def web_text_edit():
+    return render_template('text_edit.html')
+
+
+@app.route('/instructions-load')
+def load_instructions_to_web():
+    return get_instructions()
+
+
+@app.route('/instructions-bak-load')
+def load_backup_instructions():
+    config_dir = os.path.join(os.path.dirname(__file__), 'config')
+    backup_dir = os.path.join(config_dir, 'inst_backups')
+    try:
+        files = os.listdir(backup_dir)
+        if not files:
+            return "No backup files found"
+        
+        most_recent_file = os.path.join(backup_dir, max(files, key=lambda x: os.path.getmtime(os.path.join(backup_dir, x))))
+        with open(most_recent_file, 'r') as f:
+            bak = f.read().strip()
+        return bak
+    except Exception as e:
+        print(f"Error getting most recent file: {str(e)}")
+        return f"Error getting most recent file: {str(e)}"
+    return 
+
+
+@app.route('/instructions-save', methods=['POST'])
+def save_instructions_to_file():
+    try:
+        content = request.form.get('content')
+        config_dir = os.path.join(os.path.dirname(__file__), 'config')
+        backup_dir = os.path.join(config_dir, 'inst_backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        inst_file = os.path.join(config_dir, 'instructions')
+        backup_filename = (f"instructions_bak-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}")
+        backup_file = os.path.join(backup_dir, backup_filename)
+        with open(backup_file, 'w', encoding='utf-8') as backup:
+            with open(inst_file, 'r', encoding='utf-8') as old_inst:
+                backup.write(old_inst.read())
+        with open(inst_file, 'w', encoding='utf-8') as file:
+            file.write(content)
+        return f"Backup created: {backup_filename}\nFile saved successfully!"
+    except Exception as e:
+        return f'Error saving file: {str(e)}', 500
 
 
 def get_model_name():

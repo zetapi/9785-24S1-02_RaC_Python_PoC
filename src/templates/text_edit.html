@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text File Editor</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        textarea {
+            width: 80%;
+            height: 50vh;
+            font-size: 16px;
+            padding: 10px;
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #4d4d4d;
+            border-radius: 4px;
+        }
+        
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4d4d4d;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #5d5d5d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <textarea id="text-area" placeholder="Enter LLM prompt instructions here..."></textarea>
+        <div>
+            <button id="load-button">Load File</button>
+            <button id="load-bak-button">Load Backup</button>
+            <button id="save-button">Save File</button>
+            <button id="clear-button">Clear</button>
+        </div>
+    </div>
+    
+    <script>
+        const textArea = document.getElementById('text-area');
+        const loadButton = document.getElementById('load-button');
+        const loadBakButton = document.getElementById('load-bak-button');
+        const saveButton = document.getElementById('save-button');
+        const clearButton = document.getElementById('clear-button');
+
+        loadButton.addEventListener('click', () => {
+            // Fetch the text file from the server and populate the textarea
+            fetch('/instructions-load')
+                .then(response => response.text())
+                .then(data => textArea.value = data)
+                .catch(error => alert('Error loading file: ' + error));
+        });
+
+        loadBakButton.addEventListener('click', () => {
+            // Fetch the text file from the server and populate the textarea
+            fetch('/instructions-bak-load')
+                .then(response => response.text())
+                .then(data => textArea.value = data)
+                .catch(error => alert('Error loading file: ' + error));
+        });
+
+        saveButton.addEventListener('click', () => {
+            // Send the updated text to the server to save the file
+            const formData = new FormData();
+            formData.append('content', textArea.value);
+            fetch('/instructions-save', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => alert('Error saving file: ' + error));
+        });
+
+        clearButton.addEventListener('click', () => {
+            // Clear the textarea and create a backup of the previous content
+            const backupFileName = `instructions_${new Date().toISOString().replace(/:/g, '-')}.txt`;
+            fetch('/create-backup')
+                .then(response => response.text())
+                .then(data => {
+                    textArea.value = '';
+                })
+        });
+    </script>
+</body>
+</html>

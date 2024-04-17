@@ -2,3 +2,4 @@
 src/extracted/*.txt
 !requirements.txt
 *.json
+src/config/inst_backups/*
