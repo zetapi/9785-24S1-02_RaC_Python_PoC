@@ -38,42 +38,62 @@ The primary objective of this project was to provide a capability to turn legisl
 - NVIDIA GPU with CUDA cores, ≥ 8 GB vRAM
 
 ### Installation and Setup
+0. (Connect to the VM through PuTTY using these steps):
+    
+    - In the session tab:
+        - IP address: 137.92.98.218
+        - Port: 22
+    - Scroll down to SSH > Tunnels:
+        - Source port: 5000
+        - Destination: 137.92.98.218:5000
+        - Click 'Add'
+        - Click 'Open'
 
 1. Clone the repository:
 
-        $ git clone https://github.com/zetapi/9785-24S1-02_RaC_Python_PoC.git
+        git clone https://github.com/zetapi/9785-24S1-02_RaC_Python_PoC.git
 
 2. Ensure the Docker service is running on the host machine:
 
-        $ sudo systemctl start docker.service
+        sudo systemctl start docker.service
 
 3. Navigate to the cloned repo and build the dockerfile:
 
-        $ cd /path/to/the/repo
-
-        $ docker build -t rac-engine .
+        cd /path/to/the/repo
 
 
 ### Usage
 1. Prepare legislation text file(s) in a compatible format i.e. TXT, RTF, DOCX, and PDF
 
-2. Run the Docker image. This is the image that was built in the previous steps. It will also use the host's network interface, effectively turning it into a server for this app:
+2. Run the Docker images with the docker compose command. This will download any files necessary, and then build and cache these files ready to run:
 
-        $ docker run --network=host rac-engine
+        docker compose up
 
-    This container will start the ollama server and start the web server as two separate processes.
+    This will start 2 containers; the ollama server, and the web server.
+    
+    You can monitor the servers in the console as they are running after starting this command.
+
+    *Note: This command will only need to download all of the larger files once, unless the image is deleted, but no biggie.*
 
 3. Open the web page in a browser:
     
-    Either: http://localhost:5000/ <br>or http://{host-addr}:5000/
+    Either: http://localhost:5000/<br>
+    or http://medan.win.canberra.edu.au:5000/<br>
+    or http://{host-addr}:5000/ 
 
-4. Click **"Select Legislation Files"** button and select all pieces of legislation to use as context to provide to the LLM, or just drag-and-drop the files into the indicated section on the page.<br>Once these have been uploaded, the stripped '.txt' versions will appear in the list in the bottom left.
+4. If you need to edit the LLM instructions, open the text editor page in another tab:
 
-5. Ensure the files that appear in the list are correct, then click **"Generate!"** to start the process of data-embedding.
+    http://localhost:5000/instructions
 
-6. Once embedding is completed, the system will analyze the legislation text, extract the business rules based on a defined schema, and create a JSON file containing the rules in a machine-readable format.
+    *Please be gentle with this process as I haven't tested much. It creates backups each time you save new instructions.*
 
-7. Download the JSON file using the **"Download .json"** button. The output file should be named the same as what the main title of the input legislation was, but with a date and time prepended.
+5. Click **"Select Legislation Files"** button and select all pieces of legislation to use as context to provide to the LLM, or just drag-and-drop the files into the indicated section on the page.<br>Once these have been uploaded, the stripped '.txt' versions will appear in the list in the bottom left.
+
+6. Ensure the files that appear in the list are correct, then click **"Generate!"** to start the process of data-embedding.
+
+7. Once embedding is completed, the system will analyze the legislation text, extract the business rules based on a defined schema, and create a JSON file containing the rules in a machine-readable format.
+
+8. Download the JSON file using the **"Download .json"** button. The output file should be named the same as what the main title of the input legislation was, but with a date and time prepended.
 
     *e.g. 20240415_Farm_Household_Support_Act_2014.json*
 
