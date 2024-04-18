@@ -9,6 +9,8 @@ services:
     expose:
       - 11434/tcp
     container_name: ollama
+    depends_on:
+      - flask_server
     pull_policy: always
     tty: true
     restart: unless-stopped
@@ -35,8 +37,8 @@ services:
       - 5000/tcp
     environment:
       - "OLLAMA_API_BASE_URL=http://localhost:11434/api"
-    depends_on:
-      - ollama_server
+    # depends_on:
+    #   - ollama_server
     network_mode: host
 
 
