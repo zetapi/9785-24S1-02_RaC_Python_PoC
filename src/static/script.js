@@ -50,3 +50,15 @@ document.getElementById('generate-rules').addEventListener('click', function (e)
         })
         .catch(error => console.error('Error: ', error));
 });
+
+document.getElementById('clear-files').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    fetch('/clear_files')
+    .catch(error => console.error('Error: ', error));
+
+    const fileList = document.querySelectorAll('li');
+        fileList.forEach(listItem => {
+            listItem.parentNode.removeChild(listItem);
+        })
+});

@@ -43,6 +43,14 @@ def get_files():
     return jsonify(files=files)
 
 
+@app.route('/clear_files')
+def clear_files():
+    d='./src/extracted'
+    files_to_remove = [os.path.join(d,f) for f in os.listdir(d)]
+    for f in files_to_remove:
+        os.remove(f)
+
+
 @app.route('/download')
 def download():
     file_path = 'src/output/out.json'
@@ -236,8 +244,6 @@ def rag_rules_gen_chain():
         | StrOutputParser()
     )
 
-    # print(rag_chain.invoke(get_instructions()))
-
     if not os.path.exists('./src/output/'):
         print("Initialising output directory: ./src/output/")
         os.mkdir('./src/output/')
@@ -248,32 +254,6 @@ def rag_rules_gen_chain():
             print(s)
             writer.write(s)
 
-
-    # model_local = Ollama(model=get_model_name())
-
-
-    # print(f"ChromaDB retriever created\n")
-    # print(f"###\nTest joke:")
-    # rag_template = "Tell me a funny joke about {topic}"
-    # rag_prompt = ChatPromptTemplate.from_template(rag_template)
-    # rag_chain = rag_prompt | model_local | StrOutputParser()
-    # print(rag_chain.invoke({"topic": "bees"}))
-    
-
-
-    # print ("\n########\nAfter RAG\n")
-    # after_rag_template = """Answer the question based only on the following context:
-    # {context}
-    # Question: {question}
-    # """
-    # after_rag_prompt = ChatPromptTemplate.from_template(after_rag_template)
-    # after_rag_chain = (
-    #     {"context": retriever, "question": RunnablePassthrough()}
-    #     | after_rag_prompt
-    #     | model_local
-    #     | StrOutputParser()
-    # )
-    # print (after_rag_chain.invoke("What is Ollama?"))
 
 def embedding_retrieval():
     # Grab all extracted documents to be processed
@@ -301,4 +281,3 @@ def main():
 if __name__ == '__main__':
     model_local = Ollama(model=get_model_name())
     app.run(debug=True, host='0.0.0.0', port=5000)
-    # , host='0.0.0.0', port=5000
