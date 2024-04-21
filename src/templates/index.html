@@ -31,8 +31,8 @@
                     <img id='throbber' src="{{ url_for('static', filename='throbber_13.gif') }}" alt="Loading..."
                         id="throbber">
                 </div>
-                <label style="display: none; background-color: #4a7245;" id="download-rules"
-                    class="button-label">Download .json</label>
+                <a download="output/out.json" style="display: none; background-color: #4a7245;" id="download-rules"
+                    class="button-label" href="/download">Download .json</a>
                 <label style="display: none; background-color: #551515;" id="view-ai-log" class="button-label">Review
                     LLM Chat</label>
             </div>

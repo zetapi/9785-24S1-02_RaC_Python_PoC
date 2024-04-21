@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, Response, render_template, request, jsonify, send_from_directory, send_file
 import os
 import PyPDF2
 import docx
@@ -41,6 +41,24 @@ def get_files():
     directory = './src/extracted'
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
     return jsonify(files=files)
+
+
+@app.route('/download')
+def download():
+    file_path = 'src/output/out.json'
+
+    if not os.path.isfile(file_path):
+        return "File not found", 404
+
+    with open('src/output/out.json') as fp:
+        json_file = fp.read()
+
+    return send_file(
+        'output/out.json',
+        mimetype="text/json",
+        download_name="out.json",
+        as_attachment=True
+    )
 
 
 @app.route('/generate_rules')
