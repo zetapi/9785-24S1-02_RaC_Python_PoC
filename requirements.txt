@@ -2,7 +2,6 @@ flask
 PyPDF2
 python-docx
 textract
-ollama
 chromadb
 langchain
 langchain-community
