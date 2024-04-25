@@ -258,6 +258,7 @@ def rag_rules_gen_chain():
 def embedding_retrieval():
     # Grab all extracted documents to be processed
     directory = './src/extracted'
+    docs = []
     loader = DirectoryLoader(directory, glob="**/*.txt", loader_cls=TextLoader)
     docs = loader.load()
     print(f"Loaded {len(docs)} extracted doc/s")
@@ -265,7 +266,10 @@ def embedding_retrieval():
     doc_splits = text_splitter.split_documents(docs)
     print(f"Split {len(doc_splits)}")
 
-    retriever = (Chroma.from_documents(
+    vectorstore = Chroma("rag-chroma")
+    vectorstore.delete_collection()
+
+    retriever = (vectorstore.from_documents(
         documents=doc_splits,
         collection_name="rag-chroma",
         embedding=embeddings.ollama.OllamaEmbeddings(model='nomic-embed-text')
