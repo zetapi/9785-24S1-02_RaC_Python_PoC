@@ -12,7 +12,7 @@
     <form id="upload-form" method="post" enctype="multipart/form-data">
         <label for="file-upload" class="button-label">Select Legislation Files</label>
         <input id="file-upload" type="file" onchange="onFileChanged(event)" name="files" multiple
-            accept=".txt,.pdf,.docx,.rtf"><br>
+            accept=".txt,.pdf,.doc,.docx,.rtf"><br>
         <input type="submit" value="Upload" style="display: none;"> <!-- Hide the default submit button -->
     </form>
     <div id="drop-area" ondragover="event.preventDefault()" ondrop="handleDrop(event)">

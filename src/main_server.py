@@ -27,12 +27,15 @@ def index():
     if request.method == 'POST':
         files = request.files.getlist('files')
         for file in files:
-            if file.filename.endswith('.pdf'):
+            extension = str(os.path.splitext(file.filename)[1][1:]).lower()
+            if extension == 'pdf':
                 extract_text_from_pdf(file)
-            elif file.filename.endswith('.docx'):
+            elif extension == 'docx' or extension == 'doc':
                 extract_text_from_docx(file)
-            elif file.filename.endswith('.txt') or file.filename.endswith('.rtf'):
+            elif extension == 'txt' or extension == 'rtf':
                 extract_text_from_txt_rtf(file)
+            else:
+                print(f"Error uploading this file type")
     return render_template('index.html')
 
 
@@ -49,6 +52,7 @@ def clear_files():
     files_to_remove = [os.path.join(d,f) for f in os.listdir(d)]
     for f in files_to_remove:
         os.remove(f)
+    return f"Removed all temporarily uploaded files"
 
 
 @app.route('/download')
